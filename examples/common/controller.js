@@ -10,7 +10,10 @@ function todoController(update) {
     todos: [],
     filteredTodos: [],
     remainingCount: 0,
-    completedCount: 0
+    completedCount: 0,
+    ALL_TODOS: 'all',
+    ACTIVE_TODOS: 'active',
+    COMPLETED_TODOS: 'completed'
   };
   var handlers = {
     addTodo: addTodo,

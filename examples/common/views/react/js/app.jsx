@@ -8,9 +8,6 @@ var app = app || {};
 (function () {
 	'use strict';
 
-	app.ALL_TODOS = 'all';
-	app.ACTIVE_TODOS = 'active';
-	app.COMPLETED_TODOS = 'completed';
 	var TodoFooter = app.TodoFooter;
 	var TodoItem = app.TodoItem;
 
@@ -108,15 +105,6 @@ var app = app || {};
 		render: function () {
 			var footer;
 			var main;
-
-			state.filteredTodos = state.todos.filter(function(todo) {
-				if (state.filter === app.ACTIVE_TODOS) {
-					return !todo.completed;
-				} else if (state.filter === app.COMPLETED_TODOS) {
-					return todo.completed;
-				}
-				return true;
-			});
 
 			var todoItems = state.filteredTodos.map(function (todo) {
 				return (
