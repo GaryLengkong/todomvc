@@ -54,11 +54,7 @@ var app = app || {};
 		 * of magnitude performance improvement.
 		 */
 		shouldComponentUpdate: function (nextProps, nextState) {
-			return (
-				nextProps.todo !== this.props.todo ||
-				nextProps.editing !== this.props.editing ||
-				nextState.editText !== this.state.editText
-			);
+			return true;
 		},
 
 		/**

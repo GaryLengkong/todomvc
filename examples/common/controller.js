@@ -4,15 +4,11 @@
  * after every call to each function in the handlers.
  */
 function todoController(update) {
-  var todoTemplate = {
-  };
 
   var state = {
-    newTodo: "",
-    filter: "none",
+    filter: "all",
     todos: [],
-    editedTodo: {},
-    originalTodo: {},
+    filteredTodos: [],
     remainingCount: 0,
     completedCount: 0
   };
@@ -33,20 +29,16 @@ function todoController(update) {
     handlers: handlers
   };
 
-  function addTodo() {
-
-    if (!state.newTodo) {
-      return;
+  function addTodo(title) {
+    if (title) {
+      var newTodo = {
+        title: title.trim(),
+        completed: false,
+        editing: false
+      };
+      state.todos.push(newTodo);
+      updateCounts();
     }
-
-    var newTodo = {
-      title: state.newTodo.trim(),
-      completed: false
-    };
-    state.todos.push(newTodo);
-
-    state.newTodo = "";
-    updateCounts();
 
     // $scope.saving = true;
     // store.insert(newTodo)
@@ -59,12 +51,10 @@ function todoController(update) {
   }
 
   function editTodo(todo) {
-    state.editedTodo = todo;
-    // Clone the original todo to restore it on demand.
-    state.originalTodo = angular.extend({}, todo);
+    todo.editing = true;
   }
 
-  function saveEdits() {
+  function saveEdits(todo, editedTodo) {
     // For now only handle submit events
     // // Blur events are automatically triggered after the form submit event.
     // // This does some unfortunate logic handling to prevent saving twice.
@@ -74,9 +64,9 @@ function todoController(update) {
     // }
 
     // $scope.saveEvent = event;
-    if (state.editedTodo) {
-      state.editedTodo.title = state.editedTodo.title.trim();
-      state.editedTodo = null;
+    if (todo.editing) {
+      todo.title = editedTodo.trim();
+      todo.editing = false;
     }
 
     // store[todo.title ? 'put' : 'delete'](todo)
@@ -88,10 +78,8 @@ function todoController(update) {
     //   });
   }
 
-  function revertEdits() {
-    state.todos[state.todos.indexOf(state.editedTodo)] = state.originalTodo;
-    state.editedTodo = null;
-    state.originalTodo = null;
+  function revertEdits(todo) {
+    todo.editing = false;
   }
 
   function removeTodo(todo) {
@@ -134,15 +122,15 @@ function todoController(update) {
     state.allChecked = state.remainingCount === 0;
   }
 
-  function updateFilter(status) {
-    if (status !== undefined) {
-      state.status = status;
+  function updateFilter(filter) {
+    if (filter !== undefined) {
+      state.filter = filter;
     }
-    if (status === "active") {
+    if (filter === "active") {
       state.filteredTodos = state.todos.filter(function(todo) {
         return !todo.completed;
       });
-    } else if (status === "completed") {
+    } else if (filter === "completed") {
       state.filteredTodos = state.todos.filter(function(todo) {
         return todo.completed;
       });
