@@ -30,9 +30,9 @@ var app = app || {};
 		componentDidMount: function () {
 			var setState = this.setState;
 			var router = Router({
-				'/': setState.bind(this, {nowShowing: app.ALL_TODOS}),
-				'/active': setState.bind(this, {nowShowing: app.ACTIVE_TODOS}),
-				'/completed': setState.bind(this, {nowShowing: app.COMPLETED_TODOS})
+				'/': setState.bind(this, {nowShowing: state.ALL_TODOS}),
+				'/active': setState.bind(this, {nowShowing: state.ACTIVE_TODOS}),
+				'/completed': setState.bind(this, {nowShowing: state.COMPLETED_TODOS})
 			});
 			router.init('/');
 		},
