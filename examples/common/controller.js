@@ -3,7 +3,7 @@
  * to be connected to the view. Update will be called
  * after every call to each function in the handlers.
  */
-function todoController(update) {
+function todoController(updateView) {
 
   var state = {
     filter: "all",
@@ -40,7 +40,7 @@ function todoController(update) {
         editing: false
       };
       state.todos.push(newTodo);
-      updateCounts();
+      update();
     }
 
     // $scope.saving = true;
@@ -87,13 +87,13 @@ function todoController(update) {
 
   function removeTodo(todo) {
     state.todos.splice(state.todos.indexOf(todo), 1);
-    updateCounts();
+    update();
     // store.delete(todo);
   }
 
   function toggleCompleted(todo) {
     todo.completed = !todo.completed;
-    updateCounts();
+    update();
     // store.put(todo, todos.indexOf(todo))
     //   .then(function success() {}, function error() {
     //     todo.completed = !todo.completed;
@@ -104,7 +104,7 @@ function todoController(update) {
     state.todos = state.todos.filter(function(todo) {
       return !todo.completed;
     });
-    updateCounts();
+    update();
     // store.clearCompleted();
   }
 
@@ -113,11 +113,18 @@ function todoController(update) {
     state.todos.forEach(function (todo) {
       todo.completed = state.allChecked;
     });
+    update();
+  }
+
+  function update() {
+    updateFilter();
     updateCounts();
+    if (updateView) {
+      updateView();
+    }
   }
 
   function updateCounts() {
-    updateFilter();
     state.remainingCount = state.todos.filter(function(todo) {
       return !todo.completed;
     }).length;
