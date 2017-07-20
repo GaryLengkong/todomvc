@@ -8,13 +8,18 @@ function todoController(updateView) {
   var state = {
     filter: "all",
     todos: [],
+    editedTodo: null,
     filteredTodos: [],
     remainingCount: 0,
-    completedCount: 0,
+    completedCount: 0
+  };
+
+  var constants = {
     ALL_TODOS: 'all',
     ACTIVE_TODOS: 'active',
-    COMPLETED_TODOS: 'completed'
+    COMPLETED_TODOS: 'completed',
   };
+
   var handlers = {
     addTodo: addTodo,
     editTodo: editTodo,
@@ -24,80 +29,70 @@ function todoController(updateView) {
     toggleCompleted: toggleCompleted,
     clearCompletedTodos: clearCompletedTodos,
     toggleAll: toggleAll,
-    updateFilter: updateFilter
+    setFilter: setFilter,
+    setEditedTodo: setEditedTodo,
+    setNewTodo: setNewTodo
   };
 
   return {
     state: state,
-    handlers: handlers
+    handlers: handlers,
+    constants: constants
   };
 
-  function addTodo(title) {
-    if (title) {
+  function setNewTodo(value) {
+    state.newTodo = value;
+    update();
+  }
+
+  function setEditedTodo(value) {
+    state.editedTodo.title = value;
+    update();
+  }
+
+  function addTodo() {
+    if (state.newTodo) {
       var newTodo = {
-        title: title.trim(),
-        completed: false,
-        editing: false
+        title: state.newTodo.trim(),
+        completed: false
       };
       state.todos.push(newTodo);
+      state.newTodo = '';
       update();
     }
-
-    // $scope.saving = true;
-    // store.insert(newTodo)
-    //   .then(function success() {
-    //     $scope.newTodo = '';
-    //   })
-    //   .finally(function () {
-    //     $scope.saving = false;
-    //   });
   }
 
   function editTodo(todo) {
-    todo.editing = true;
+    state.editedTodo = todo;
+    state.originalTodo = todo.title;
+    update();
   }
 
-  function saveEdits(todo, editedTodo) {
-    // For now only handle submit events
-    // // Blur events are automatically triggered after the form submit event.
-    // // This does some unfortunate logic handling to prevent saving twice.
-    // if (event === 'blur' && $scope.saveEvent === 'submit') {
-    //   $scope.saveEvent = null;
-    //   return;
-    // }
-
-    // $scope.saveEvent = event;
-    if (todo.editing) {
-      todo.title = editedTodo.trim();
-      todo.editing = false;
+  function saveEdits(todo) {
+    if (!state.editedTodo) {
+      return;
     }
-
-    // store[todo.title ? 'put' : 'delete'](todo)
-    //   .then(function success() {}, function error() {
-    //     todo.title = $scope.originalTodo.title;
-    //   })
-    //   .finally(function () {
-    //     $scope.editedTodo = null;
-    //   });
+    todo.title = state.editedTodo.title.trim();
+    state.editedTodo = null;
+    state.originalTodo = '';
+    update();
   }
 
   function revertEdits(todo) {
-    todo.editing = false;
+    todo.title = state.originalTodo;
+    state.editedTodo = null;
+    state.originalTodo = '';
+    update();
   }
 
   function removeTodo(todo) {
     state.todos.splice(state.todos.indexOf(todo), 1);
     update();
-    // store.delete(todo);
   }
 
   function toggleCompleted(todo) {
     todo.completed = !todo.completed;
     update();
-    // store.put(todo, todos.indexOf(todo))
-    //   .then(function success() {}, function error() {
-    //     todo.completed = !todo.completed;
-    //   });
   }
 
   function clearCompletedTodos() {
@@ -105,7 +100,6 @@ function todoController(updateView) {
       return !todo.completed;
     });
     update();
-    // store.clearCompleted();
   }
 
   function toggleAll() {
@@ -116,8 +110,13 @@ function todoController(updateView) {
     update();
   }
 
+  function setFilter(filter) {
+    state.filter = filter;
+    update();
+  }
+
   function update() {
-    updateFilter();
+    updateFilteredTodos();
     updateCounts();
     if (updateView) {
       updateView();
@@ -132,19 +131,16 @@ function todoController(updateView) {
     state.allChecked = state.remainingCount === 0;
   }
 
-  function updateFilter(filter) {
-    if (filter !== undefined) {
-      state.filter = filter;
-    }
-    if (filter === "active") {
+  function updateFilteredTodos() {
+    if (state.filter === constants.ACTIVE_TODOS) {
       state.filteredTodos = state.todos.filter(function(todo) {
         return !todo.completed;
       });
-    } else if (filter === "completed") {
+    } else if (state.filter === constants.COMPLETED_TODOS) {
       state.filteredTodos = state.todos.filter(function(todo) {
         return todo.completed;
       });
-    } else {
+    } else if (state.filter === constants.ALL_TODOS || state.filter === ''){
       state.filteredTodos = state.todos;
     }
   }

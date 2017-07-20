@@ -20,47 +20,17 @@
 		}
 	};
 
+	var controller = new todoController();
+	var state = controller.state;
+	var handlers = controller.handlers;
+
 	exports.app = new Vue({
 
 		// the root element that will be compiled
 		el: '.todoapp',
 
 		// app initial state
-		data: {
-			todos: todoStorage.fetch(),
-			newTodo: '',
-			editedTodo: null,
-			visibility: 'all'
-		},
-
-		// watch todos change for localStorage persistence
-		watch: {
-			todos: {
-				deep: true,
-				handler: todoStorage.save
-			}
-		},
-
-		// computed properties
-		// http://vuejs.org/guide/computed.html
-		computed: {
-			filteredTodos: function () {
-				return filters[this.visibility](this.todos);
-			},
-			remaining: function () {
-				return filters.active(this.todos).length;
-			},
-			allDone: {
-				get: function () {
-					return this.remaining === 0;
-				},
-				set: function (value) {
-					this.todos.forEach(function (todo) {
-						todo.completed = value;
-					});
-				}
-			}
-		},
+		data: state,
 
 		// methods that implement data logic.
 		// note there's no DOM manipulation here at all.
@@ -75,13 +45,12 @@
 				if (!value) {
 					return;
 				}
-				this.todos.push({ title: value, completed: false });
+				handlers.addTodo(value);
 				this.newTodo = '';
 			},
 
 			removeTodo: function (todo) {
-				var index = this.todos.indexOf(todo);
-				this.todos.splice(index, 1);
+				handlers.removeTodo(todo);
 			},
 
 			editTodo: function (todo) {
@@ -106,7 +75,7 @@
 			},
 
 			removeCompleted: function () {
-				this.todos = filters.active(this.todos);
+				handlers.removeCompletedTodos();
 			}
 		},
 

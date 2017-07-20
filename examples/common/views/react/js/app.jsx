@@ -18,20 +18,19 @@ var app = app || {};
 		getInitialState: function() {
 			this.controller = todoController(this.forceUpdate.bind(this));
 			this.handlers = this.controller.handlers;
+			app.constants = this.controller.constants;
 			return this.controller.state;
 		},
 
-		handleChange: function (event) {
-			this.state.newTodo = event.target.value;
-			this.forceUpdate();
+		handleNewTodoChange: function (event) {
+			this.handlers.setNewTodo(event.target.value);
 		},
 
 		handleNewTodoKeyDown: function (event) {
 			if (event.keyCode !== ENTER_KEY) {
 				return;
 			}
-			this.handlers.addTodo(this.state.newTodo);
-			this.state.newTodo = '';
+			this.handlers.addTodo();
 		},
 
 		render: function () {
@@ -41,14 +40,14 @@ var app = app || {};
 			var todoItems = this.state.filteredTodos.map(function (todo) {
 				return (
 					<TodoItem
-						key={todo.id}
 						todo={todo}
-						onToggle={this.handlers.toggleCompleted.bind(this, todo)}
+						editedTodo={this.state.editedTodo}
+						onEscape={this.handlers.revertEdits.bind(this, todo)}
+						onEditChange={this.handlers.setEditedTodo}
+						onSubmit={this.handlers.saveEdits.bind(this, todo)}
 						onDestroy={this.handlers.removeTodo.bind(this, todo)}
-						onEdit={this.handlers.editTodo.bind(this, todo)}
-						editing={todo.editing}
-						onSave={this.handlers.saveEdits.bind(this, todo)}
-						onCancel={this.handlers.revertEdits.bind(this, todo)}
+						onDoubleClick={this.handlers.editTodo.bind(this, todo)}
+						onToggle={this.handlers.toggleCompleted.bind(this, todo)}
 					/>
 				);
 			}, this);
@@ -61,7 +60,7 @@ var app = app || {};
 						completedCount={this.state.completedCount}
 						nowShowing={this.state.filter}
 						onClearCompleted={this.handlers.clearCompletedTodos}
-						onChangeFilter={this.handlers.updateFilter}
+						onChangeFilter={this.handlers.setFilter}
 					/>;
 			}
 
@@ -90,7 +89,7 @@ var app = app || {};
 							placeholder="What needs to be done?"
 							value={this.state.newTodo}
 							onKeyDown={this.handleNewTodoKeyDown}
-							onChange={this.handleChange}
+							onChange={this.handleNewTodoChange}
 							autoFocus={true}
 						/>
 					</header>

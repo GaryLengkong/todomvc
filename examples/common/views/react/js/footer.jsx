@@ -33,8 +33,8 @@ var app = app || {};
 						<li>
 							<a
 								href="#/"
-								className={classNames({selected: nowShowing === app.ALL_TODOS})}
-								onClick={this.props.onChangeFilter.bind(this, app.ALL_TODOS)}>
+								className={classNames({selected: nowShowing === app.constants.ALL_TODOS})}
+								onClick={this.props.onChangeFilter.bind(this, app.constants.ALL_TODOS)}>
 									All
 							</a>
 						</li>
@@ -42,8 +42,8 @@ var app = app || {};
 						<li>
 							<a
 								href="#/active"
-								className={classNames({selected: nowShowing === app.ACTIVE_TODOS})}
-								onClick={this.props.onChangeFilter.bind(this, app.ACTIVE_TODOS)}>
+								className={classNames({selected: nowShowing === app.constants.ACTIVE_TODOS})}
+								onClick={this.props.onChangeFilter.bind(this, app.constants.ACTIVE_TODOS)}>
 									Active
 							</a>
 						</li>
@@ -51,8 +51,8 @@ var app = app || {};
 						<li>
 							<a
 								href="#/completed"
-								className={classNames({selected: nowShowing === app.COMPLETED_TODOS})}
-								onClick={this.props.onChangeFilter.bind(this, app.COMPLETED_TODOS)}>
+								className={classNames({selected: nowShowing === app.constants.COMPLETED_TODOS})}
+								onClick={this.props.onChangeFilter.bind(this, app.constants.COMPLETED_TODOS)}>
 									Completed
 							</a>
 						</li>

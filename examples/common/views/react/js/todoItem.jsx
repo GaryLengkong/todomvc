@@ -12,40 +12,6 @@ var app = app || {};
 	var ENTER_KEY = 13;
 
 	app.TodoItem = React.createClass({
-		handleSubmit: function (event) {
-			var val = this.state.editText.trim();
-			if (val) {
-				this.props.onSave(val);
-				this.setState({editText: val});
-			} else {
-				this.props.onDestroy();
-			}
-		},
-
-		handleEdit: function () {
-			this.props.onEdit();
-			this.setState({editText: this.props.todo.title});
-		},
-
-		handleKeyDown: function (event) {
-			if (event.which === ESCAPE_KEY) {
-				this.setState({editText: this.props.todo.title});
-				this.props.onCancel(event);
-			} else if (event.which === ENTER_KEY) {
-				this.handleSubmit(event);
-			}
-		},
-
-		handleChange: function (event) {
-			if (this.props.editing) {
-				this.setState({editText: event.target.value});
-			}
-		},
-
-		getInitialState: function () {
-			return {editText: this.props.todo.title};
-		},
-
 		/**
 		 * This is a completely optional performance enhancement that you can
 		 * implement on any React component. If you were to delete this method
@@ -57,6 +23,18 @@ var app = app || {};
 			return true;
 		},
 
+		handleEditChange: function(event) {
+			this.props.onEditChange(event.target.value);
+		},
+
+		handleEditKeyDown: function(event) {
+	    if (event.which === ESCAPE_KEY) {
+	      this.props.onEscape();
+	    } else if (event.which === ENTER_KEY) {
+	      this.props.onSubmit();
+	    }
+		},
+
 		/**
 		 * Safely manipulate the DOM after updating the state when invoking
 		 * `this.props.onEdit()` in the `handleEdit` method above.
@@ -64,7 +42,7 @@ var app = app || {};
 		 * and https://facebook.github.io/react/docs/component-specs.html#updating-componentdidupdate
 		 */
 		componentDidUpdate: function (prevProps) {
-			if (!prevProps.editing && this.props.editing) {
+			if (prevProps.editedTodo != this.props.todo  && this.props.editedTodo == this.props.todo) {
 				var node = React.findDOMNode(this.refs.editField);
 				node.focus();
 				node.setSelectionRange(node.value.length, node.value.length);
@@ -75,7 +53,7 @@ var app = app || {};
 			return (
 				<li className={classNames({
 					completed: this.props.todo.completed,
-					editing: this.props.editing
+					editing: this.props.todo == this.props.editedTodo
 				})}>
 					<div className="view">
 						<input
@@ -84,7 +62,7 @@ var app = app || {};
 							checked={this.props.todo.completed}
 							onChange={this.props.onToggle}
 						/>
-						<label onDoubleClick={this.handleEdit}>
+						<label onDoubleClick={this.props.onDoubleClick}>
 							{this.props.todo.title}
 						</label>
 						<button className="destroy" onClick={this.props.onDestroy} />
@@ -92,10 +70,10 @@ var app = app || {};
 					<input
 						ref="editField"
 						className="edit"
-						value={this.state.editText}
-						onBlur={this.handleSubmit}
-						onChange={this.handleChange}
-						onKeyDown={this.handleKeyDown}
+						value={this.props.editedTodo ? this.props.editedTodo.title : ''}
+						onBlur={this.props.onSubmit}
+						onChange={this.handleEditChange}
+						onKeyDown={this.handleEditKeyDown}
 					/>
 				</li>
 			);
