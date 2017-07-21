@@ -11,7 +11,9 @@ function todoController(updateView) {
     editedTodo: null,
     filteredTodos: [],
     remainingCount: 0,
-    completedCount: 0
+    completedCount: 0,
+    newTodo: '',
+    allChecked: false
   };
 
   var constants = {
@@ -31,7 +33,8 @@ function todoController(updateView) {
     toggleAll: toggleAll,
     setFilter: setFilter,
     setEditedTodo: setEditedTodo,
-    setNewTodo: setNewTodo
+    setNewTodo: setNewTodo,
+    update: update
   };
 
   return {
