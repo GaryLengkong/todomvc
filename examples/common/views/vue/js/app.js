@@ -18,7 +18,10 @@
 		el: '.todoapp',
 
 		// app initial state
-		data: state,
+		data: {
+			state: state,
+			constants: constants
+		},
 
 		// methods that implement data logic.
 		// note there's no DOM manipulation here at all.
