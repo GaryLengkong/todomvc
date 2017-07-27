@@ -16,7 +16,7 @@ var app = app || {};
 	var TodoApp = React.createClass({
 
 		getInitialState: function() {
-			this.controller = todoController(this.forceUpdate.bind(this));
+			this.controller = todoController(this.setState.bind(this));
 			this.handlers = this.controller.handlers;
 			app.constants = this.controller.constants;
 			return this.controller.state;

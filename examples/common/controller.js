@@ -122,7 +122,7 @@ function todoController(updateView) {
     updateFilteredTodos();
     updateCounts();
     if (updateView) {
-      updateView();
+      updateView(state);
     }
   }
 
