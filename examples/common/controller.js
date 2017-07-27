@@ -13,7 +13,8 @@ function todoController(updateView) {
     remainingCount: 0,
     completedCount: 0,
     newTodo: '',
-    allChecked: false
+    allChecked: false,
+    originalTodo: ''
   };
 
   var constants = {
@@ -33,24 +34,51 @@ function todoController(updateView) {
     toggleAll: toggleAll,
     setFilter: setFilter,
     setEditedTodo: setEditedTodo,
-    setNewTodo: setNewTodo,
-    update: update
+    setNewTodo: setNewTodo
   };
 
-  return {
-    state: state,
-    handlers: handlers,
-    constants: constants
-  };
+  return getController(state, handlers, update, constants, this);
+
+  // This function should be moved to a utility class/object
+  /**
+   * Executes before function before and after function after
+   * executing functionToWrap
+   */
+  function wrap(functionToWrap, before, after, thisObject) {
+    return function () {
+      var args = Array.prototype.slice.call(arguments),
+          result;
+      if (before) before.apply(thisObject || this, args);
+      result = functionToWrap.apply(thisObject || this, args);
+      if (after) after.apply(thisObject || this, args);
+      return result;
+    }
+  }
+
+  // This function should be moved to a utility class/object
+  function wrapFunctions(functionsToWrap, before, after, thisObject) {
+    var wrappedFunctions = {};
+    for (var i in functionsToWrap) {
+      wrappedFunctions[i] = wrap(functionsToWrap[i], before, after, thisObject);
+    }
+    return wrappedFunctions;
+  }
+
+  // This function should be moved to a utility class/object
+  function getController(state, handlers, update, constants, thisObject) {
+    return {
+      state: state,
+      handlers: wrapFunctions(handlers, null, update, thisObject),
+      constants: constants
+    };
+  }
 
   function setNewTodo(value) {
     state.newTodo = value;
-    update();
   }
 
   function setEditedTodo(value) {
     state.editedTodo.title = value;
-    update();
   }
 
   function addTodo() {
@@ -61,14 +89,12 @@ function todoController(updateView) {
       };
       state.todos.push(newTodo);
       state.newTodo = '';
-      update();
     }
   }
 
   function editTodo(todo) {
     state.editedTodo = todo;
     state.originalTodo = todo.title;
-    update();
   }
 
   function saveEdits(todo) {
@@ -78,31 +104,26 @@ function todoController(updateView) {
     todo.title = state.editedTodo.title.trim();
     state.editedTodo = null;
     state.originalTodo = '';
-    update();
   }
 
   function revertEdits(todo) {
     todo.title = state.originalTodo;
     state.editedTodo = null;
     state.originalTodo = '';
-    update();
   }
 
   function removeTodo(todo) {
     state.todos.splice(state.todos.indexOf(todo), 1);
-    update();
   }
 
   function toggleCompleted(todo) {
     todo.completed = !todo.completed;
-    update();
   }
 
   function clearCompletedTodos() {
     state.todos = state.todos.filter(function(todo) {
       return !todo.completed;
     });
-    update();
   }
 
   function toggleAll() {
@@ -110,12 +131,10 @@ function todoController(updateView) {
     state.todos.forEach(function (todo) {
       todo.completed = state.allChecked;
     });
-    update();
   }
 
   function setFilter(filter) {
     state.filter = filter;
-    update();
   }
 
   function update() {
