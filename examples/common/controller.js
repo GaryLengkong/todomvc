@@ -2,20 +2,23 @@
  * Returns an object containing the state and handlers
  * to be connected to the view. Update will be called
  * after every call to each function in the handlers.
+ * Route parameters can also be passed in if using view
+ * specific router.
  */
-function todoController(updateView) {
+function todoController(updateView, routeParams) {
 
-  var constants = {
-    NAME_URL_PARAM: 'name',
-    STORE_KEY: 'todo',
-    ALL_TODOS: 'all',
-    ACTIVE_TODOS: 'active',
-    COMPLETED_TODOS: 'completed',
+  var state = {
+    filter: constants.ALL_TODOS,
+    todos: [],
+    editedTodo: null,
+    filteredTodos: [],
+    remainingCount: 0,
+    completedCount: 0,
+    newTodo: '',
+    allChecked: false,
+    originalTodo: '',
+    isLoaded: true
   };
-
-  var state = getState();
-
-  var data = getData();
 
   var handlers = {
     addTodo: addTodo,
@@ -28,83 +31,67 @@ function todoController(updateView) {
     toggleAll: toggleAll,
     setFilter: setFilter,
     setEditedTodo: setEditedTodo,
-    setNewTodo: setNewTodo,
+    setNewTodo: setNewTodo
+    /*
     getFilteredTodos: getFilteredTodos,
     getCompletedCount: getCompletedCount,
     getRemainingCount: getRemainingCount,
     isAllCompleted: isAllCompleted
+    */
   };
 
-  return getController(state, data, handlers, update, constants, this);
+  activate();
 
-  function getState() {
+  // This will cause update to be called once and after every call to any method in handlers
+  // It's a convenience function to make sure that developers don't forget to do it
+  return getController(state, handlers, update);
+
+  // Alternatively
+  /*
+  return {
+    state: state,
+    handlers: util.wrapFunctions(handlers, null, update, this),
+    constants: constants
+  };
+  */
+
+  function activate() {
     // Get name of object from route param and retrieve data from the backend
-    var routeParams = util.getRouteParameters();
+    // Optionally you can get
+    var routeParams = routeParams ? routeParams : util.getRouteParameters();
     var todosName = routeParams[constants.NAME_URL_PARAM];
     if (todosName) {
-      return getStateForExistingTodos(todosName);
+      // Load model data from backend (no ui state)
+      loadTodos(todosName);
     } else {
-      // If we are not loading existing object, get saved state from the client store
-      var storedState = getStateFromStore();
-      return storedState ? storedState : getInitialState();
+      // Load data from client side storage (including saved ui state)
+      loadStateFromStore();
     }
+    // Load dynamic data (that will not be saved)
+    loadData();
   }
 
-  function getStateForExistingTodos() {
-    var state = getInitialState();
+  function loadTodos(todosName) {
     state.isLoaded = false;
-    loadTodos(todosName);
-    return state;
-  }
-
-  function loadTodos() {
     // Populate state based on data from backend
     return backend.getTodos(todosName).then(function(todos) {
       state.todos = todos;
       state.isLoaded = true;
+      update();
     });
   }
 
-  /**
-   * Data is the object that contains information that are not related to the
-   * state of the UI and has to be reloaded every time a page is refreshed.
-   * For example: The list of pools for the default pool dropdown in virtual
-   * server page.
-   */
-  function getData() {
-    // Fetch backend data
-    loadData();
-    return {};
+  function loadStateFromStore() {
+    var storedState = getStateFromStore();
+    state = storedState ? storedState : state;
   }
 
+  // Load dynamic data, e.g. list of available pools
   function loadData() {
     return backend.getInfo().then(function(info) {
-      data.info = info;
+      state.info = info;
+      update();
     });
-  }
-
-  function getInitialState() {
-    return {
-      filter: constants.ALL_TODOS,
-      todos: [],
-      editedTodo: null,
-      filteredTodos: [],
-      remainingCount: 0,
-      completedCount: 0,
-      newTodo: '',
-      allChecked: false,
-      originalTodo: '',
-      isLoaded: true
-    };
-  }
-
-
-  function setNewTodo(value) {
-    state.newTodo = value;
-  }
-
-  function setEditedTodo(value) {
-    state.editedTodo.title = value;
   }
 
   function addTodo() {
@@ -163,21 +150,27 @@ function todoController(updateView) {
     state.filter = filter;
   }
 
+  // Methods only used by react
+
+  function setNewTodo(value) {
+    state.newTodo = value;
+  }
+
+  function setEditedTodo(value) {
+    state.editedTodo.title = value;
+  }
+
+  // Update methods
+
   function update() {
+    // Update computed states
     updateFilteredTodos();
     updateCounts();
+
     updateStateInStore();
     if (updateView) {
       updateView(state);
     }
-  }
-
-  function getStateFromStore() {
-    return util.getItemFromStore(constants.STORE_KEY);
-  }
-
-  function updateStateInStore() {
-    return util.setItemInStore(constants.STORE_KEY, state);
   }
 
   function updateCounts() {
@@ -202,8 +195,20 @@ function todoController(updateView) {
     }
   }
 
-  // Optional getters for computed states (states that derive values from other states)
+  // Methods for storing, retrieving state from store
 
+  function getStateFromStore() {
+    return util.getItemFromStore(constants.STORE_KEY);
+  }
+
+  function updateStateInStore() {
+    return util.setItemInStore(constants.STORE_KEY, state);
+  }
+
+  // Optional getters for computed states (states that derive values from other states)
+  // No need to call updateCounts and updateFilteredTodos in the update function if
+  // we use this, but performance will be worse off.
+  /*
   function getRemainingCount() {
     return state.todos.filter(function(todo) {
       return !todo.completed;
@@ -233,5 +238,6 @@ function todoController(updateView) {
       return state.todos;
     }
   }
+  */
 
 }

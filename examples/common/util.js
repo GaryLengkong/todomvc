@@ -39,15 +39,13 @@ function wrapFunctions(functionsToWrap, before, after, thisObject) {
   return wrappedFunctions;
 }
 
-function getController(state, data, handlers, update, constants, thisObject) {
+function getController(state, handlers, update) {
   // Call update to get computed states
   update();
 
   return {
     state: state,
-    data: data,
-    handlers: wrapFunctions(handlers, null, update, thisObject),
-    constants: constants
+    handlers: wrapFunctions(handlers, null, update, null)
   };
 }
 

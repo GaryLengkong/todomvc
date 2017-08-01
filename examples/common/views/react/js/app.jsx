@@ -18,7 +18,7 @@ var app = app || {};
 		getInitialState: function() {
 			this.controller = todoController(this.setState.bind(this));
 			this.handlers = this.controller.handlers;
-			app.constants = this.controller.constants;
+			app.constants = constants;
 			return this.controller.state;
 		},
 

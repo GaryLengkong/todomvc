@@ -7,7 +7,6 @@
 	var controller = new todoController();
 	var state = controller.state;
 	var handlers = controller.handlers;
-	var constants = controller.constants;
 	handlers.pluralize = function (word, count) {
 		return word + (count === 1 ? '' : 's');
 	}
