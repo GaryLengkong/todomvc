@@ -22,7 +22,6 @@ var util = {
   setItemInStore: setItemInStore
 }
 
-// This function should be moved to a utility class/object
 function getRouteParameters() {
   var parameters = {};
   decodeURIComponent(window.location.hash).split("&").map(function(parameter) {
@@ -32,7 +31,6 @@ function getRouteParameters() {
   return parameters;
 }
 
-// This function should be moved to a utility class/object
 /**
  * Executes before function before and after function after
  * executing functionToWrap
@@ -48,7 +46,6 @@ function wrapFunction(functionToWrap, before, after, thisObject) {
   }
 }
 
-// This function should be moved to a utility class/object
 function wrapFunctions(functionsToWrap, before, after, thisObject) {
   var wrappedFunctions = {};
   for (var i in functionsToWrap) {
@@ -57,8 +54,10 @@ function wrapFunctions(functionsToWrap, before, after, thisObject) {
   return wrappedFunctions;
 }
 
-// This function should be moved to a utility class/object
 function getController(state, data, handlers, update, constants, thisObject) {
+  // Call update to get computed states
+  update();
+
   return {
     state: state,
     data: data,
@@ -67,12 +66,10 @@ function getController(state, data, handlers, update, constants, thisObject) {
   };
 }
 
-// This function should be moved to a utility class/function
 function getItemFromStore(key) {
   return JSON.parse(sessionStorage.getItem(key));
 }
 
-// This function should be moved to a utility class/function
 function setItemInStore(key, value) {
   return sessionStorage.setItem(key, JSON.stringify(value));
 }
@@ -107,7 +104,11 @@ function todoController(updateView) {
     toggleAll: toggleAll,
     setFilter: setFilter,
     setEditedTodo: setEditedTodo,
-    setNewTodo: setNewTodo
+    setNewTodo: setNewTodo,
+    getFilteredTodos: getFilteredTodos,
+    getCompletedCount: getCompletedCount,
+    getRemainingCount: getRemainingCount,
+    isAllCompleted: isAllCompleted
   };
 
   return getController(state, data, handlers, update, constants, this);
@@ -244,6 +245,36 @@ function todoController(updateView) {
     updateStateInStore();
     if (updateView) {
       updateView(state);
+    }
+  }
+
+  function getRemainingCount() {
+    return state.todos.filter(function(todo) {
+      return !todo.completed;
+    }).length;
+  }
+
+  function getCompletedCount() {
+    return state.todos.filter(function(todo) {
+      return todo.completed;
+    }).length;
+  }
+
+  function isAllCompleted() {
+    return state.remainingCount === 0;
+  }
+
+  function getFilteredTodos() {
+    if (state.filter === constants.ACTIVE_TODOS) {
+      return state.todos.filter(function(todo) {
+        return !todo.completed;
+      });
+    } else if (state.filter === constants.COMPLETED_TODOS) {
+      return state.todos.filter(function(todo) {
+        return todo.completed;
+      });
+    } else if (state.filter === constants.ALL_TODOS || state.filter === ''){
+      return state.todos;
     }
   }
 
