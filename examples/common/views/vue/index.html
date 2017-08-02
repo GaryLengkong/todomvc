@@ -31,9 +31,9 @@
 					<strong v-text="state.remainingCount"></strong> {{pluralize('item', state.remainingCount)}} left
 				</span>
 				<ul class="filters">
-					<li><a href="#/all" @click="setFilter(constants.ALL_TODOS)" :class="{selected: state.filter == constants.ALL_TODOS}">All</a></li>
-					<li><a href="#/active" @click="setFilter(constants.ACTIVE_TODOS)" :class="{selected: state.filter == constants.ACTIVE_TODOS}">Active</a></li>
-					<li><a href="#/completed" @click="setFilter(constants.COMPLETED_TODOS)" :class="{selected: state.filter == constants.COMPLETED_TODOS}">Completed</a></li>
+					<li><a href="#/all" :class="{selected: state.isAllFiltered}">All</a></li>
+					<li><a href="#/active" :class="{selected: state.isActiveFiltered}">Active</a></li>
+					<li><a href="#/completed" :class="{selected: state.isCompletedFiltered}">Completed</a></li>
 				</ul>
 				<button class="clear-completed" @click="clearCompletedTodos" v-show="state.todos.length > state.remainingCount">
 					Clear completed

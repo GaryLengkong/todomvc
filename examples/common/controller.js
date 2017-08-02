@@ -58,7 +58,9 @@ function todoController(updateView, routeParams) {
   function activate() {
     // Get name of object from route param and retrieve data from the backend
     // Optionally you can get
-    var routeParams = routeParams ? routeParams : util.getRouteParameters();
+    if (!routeParams) {
+      routeParams = util.getRouteParameters();
+    }
     var todosName = routeParams[constants.NAME_URL_PARAM];
     if (todosName) {
       // Load model data from backend (no ui state)
@@ -67,6 +69,10 @@ function todoController(updateView, routeParams) {
       // Load data from client side storage (including saved ui state)
       loadStateFromStore();
     }
+
+    // Do this after loading state from store
+    setFilter(routeParams.filter);
+
     // Load dynamic data (that will not be saved)
     loadData();
   }
@@ -182,17 +188,14 @@ function todoController(updateView, routeParams) {
   }
 
   function updateFilteredTodos() {
-    if (state.filter === constants.ACTIVE_TODOS) {
-      state.filteredTodos = state.todos.filter(function(todo) {
-        return !todo.completed;
-      });
-    } else if (state.filter === constants.COMPLETED_TODOS) {
-      state.filteredTodos = state.todos.filter(function(todo) {
-        return todo.completed;
-      });
-    } else if (state.filter === constants.ALL_TODOS || state.filter === ''){
-      state.filteredTodos = state.todos;
-    }
+    state.isAllFiltered = !state.filter || state.filter === constants.ALL_TODOS;
+    state.isActiveFiltered = state.filter === constants.ACTIVE_TODOS;
+    state.isCompletedFiltered = state.filter === constants.COMPLETED_TODOS;
+
+    state.filteredTodos = state.todos.filter(function(todo) {
+      return state.isAllFiltered ? true :
+        state.isCompletedFiltered ? todo.completed : !todo.completed;
+    });
   }
 
   // Methods for storing, retrieving state from store

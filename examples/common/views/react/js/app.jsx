@@ -22,6 +22,15 @@ var app = app || {};
 			return this.controller.state;
 		},
 
+		componentDidMount: function() {
+			var router = Router({
+				'/': this.handlers.setFilter.bind(this, constants.ALL_TODOS),
+				'/active' : this.handlers.setFilter.bind(this, constants.ACTIVE_TODOS),
+				'/completed': this.handlers.setFilter.bind(this, constants.COMPLETED_TODOS)
+			});
+			router.init('/');
+		},
+
 		handleNewTodoChange: function (event) {
 			this.handlers.setNewTodo(event.target.value);
 		},
@@ -33,11 +42,8 @@ var app = app || {};
 			this.handlers.addTodo();
 		},
 
-		render: function () {
-			var footer;
-			var main;
-
-			var todoItems = this.state.filteredTodos.map(function (todo) {
+		todoItems: function() {
+			return this.state.filteredTodos.map(function (todo) {
 				return (
 					<TodoItem
 						todo={todo}
@@ -51,21 +57,11 @@ var app = app || {};
 					/>
 				);
 			}, this);
+		},
 
-
-			if (this.state.remainingCount || this.state.completedCount) {
-				footer =
-					<TodoFooter
-						count={this.state.remainingCount}
-						completedCount={this.state.completedCount}
-						nowShowing={this.state.filter}
-						onClearCompleted={this.handlers.clearCompletedTodos}
-						onChangeFilter={this.handlers.setFilter}
-					/>;
-			}
-
+		main: function() {
 			if (this.state.filteredTodos.length) {
-				main = (
+				return (
 					<section className="main">
 						<input
 							className="toggle-all"
@@ -74,11 +70,28 @@ var app = app || {};
 							checked={this.state.remainingCount === 0}
 						/>
 						<ul className="todo-list">
-							{todoItems}
+							{this.todoItems()}
 						</ul>
 					</section>
 				);
 			}
+		},
+
+		footer: function() {
+			if (this.state.remainingCount || this.state.completedCount) {
+				return (
+					<TodoFooter
+						count={this.state.remainingCount}
+						completedCount={this.state.completedCount}
+						filter={this.state.filter}
+						onClearCompleted={this.handlers.clearCompletedTodos}
+						onChangeFilter={this.handlers.setFilter}
+					/>
+				);
+			}
+		},
+
+		render: function () {
 
 			return (
 				<div>
@@ -93,8 +106,8 @@ var app = app || {};
 							autoFocus={true}
 						/>
 					</header>
-					{main}
-					{footer}
+					{this.main()}
+					{this.footer()}
 				</div>
 			);
 		}

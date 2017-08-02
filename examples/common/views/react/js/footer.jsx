@@ -23,7 +23,7 @@ var app = app || {};
 				);
 			}
 
-			var nowShowing = this.props.nowShowing;
+			var filter = this.props.filter;
 			return (
 				<footer className="footer">
 					<span className="todo-count">
@@ -31,30 +31,13 @@ var app = app || {};
 					</span>
 					<ul className="filters">
 						<li>
-							<a
-								href="#/"
-								className={classNames({selected: nowShowing === app.constants.ALL_TODOS})}
-								onClick={this.props.onChangeFilter.bind(this, app.constants.ALL_TODOS)}>
-									All
-							</a>
+							<a href="#/" className={classNames({selected: filter === app.constants.ALL_TODOS})}>All</a>
 						</li>
-						{' '}
 						<li>
-							<a
-								href="#/active"
-								className={classNames({selected: nowShowing === app.constants.ACTIVE_TODOS})}
-								onClick={this.props.onChangeFilter.bind(this, app.constants.ACTIVE_TODOS)}>
-									Active
-							</a>
+							<a href="#/active" className={classNames({selected: filter === app.constants.ACTIVE_TODOS})}>Active</a>
 						</li>
-						{' '}
 						<li>
-							<a
-								href="#/completed"
-								className={classNames({selected: nowShowing === app.constants.COMPLETED_TODOS})}
-								onClick={this.props.onChangeFilter.bind(this, app.constants.COMPLETED_TODOS)}>
-									Completed
-							</a>
+							<a href="#/completed" className={classNames({selected: filter === app.constants.COMPLETED_TODOS})}>Completed</a>
 						</li>
 					</ul>
 					{clearButton}

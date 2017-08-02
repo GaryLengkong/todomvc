@@ -40,13 +40,13 @@
 					</span>
 					<ul id="filters">
 						<li>
-							<a ng-class="{selected: state.filter === constants.ALL_TODOS} " href="#/" ng-click="handlers.setFilter(constants.ALL_TODOS)">All</a>
+							<a ng-class="{selected: state.isAllFiltered} " href="#/">All</a>
 						</li>
 						<li>
-							<a ng-class="{selected: state.filter === constants.ACTIVE_TODOS}" href="#/" ng-click="handlers.setFilter(constants.ACTIVE_TODOS)">Active</a>
+							<a ng-class="{selected: state.isActiveFiltered}" href="#/{{constants.ACTIVE_TODOS}}">Active</a>
 						</li>
 						<li>
-							<a ng-class="{selected: state.filter === constants.COMPLETED_TODOS}" href="#/" ng-click="handlers.setFilter(constants.COMPLETED_TODOS)">Completed</a>
+							<a ng-class="{selected: state.isCompletedFiltered}" href="#/{{constants.COMPLETED_TODOS}}">Completed</a>
 						</li>
 					</ul>
 					<button id="clear-completed" ng-click="handlers.clearCompletedTodos()" ng-show="state.completedCount">Clear completed</button>
