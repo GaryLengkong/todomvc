@@ -8,7 +8,6 @@ var app = app || {};
 (function () {
 	'use strict';
 
-	var TodoFooter = app.TodoFooter;
 	var TodoItem = app.TodoItem;
 
 	var ENTER_KEY = 13;
@@ -67,7 +66,7 @@ var app = app || {};
 							className="toggle-all"
 							type="checkbox"
 							onChange={this.handlers.toggleAll}
-							checked={this.state.remainingCount === 0}
+							checked={this.state.isAllCompleted}
 						/>
 						<ul className="todo-list">
 							{this.todoItems()}
@@ -78,15 +77,36 @@ var app = app || {};
 		},
 
 		footer: function() {
-			if (this.state.remainingCount || this.state.completedCount) {
+			var activeTodoWord = app.Utils.pluralize(this.state.remainingCount, 'item');
+			var clearButton = null;
+
+			if (this.state.completedCount > 0) {
+				clearButton = (
+					<button
+						className="clear-completed"
+						onClick={this.handlers.clearCompletedTodos}>
+						Clear completed
+					</button>
+				);
+
 				return (
-					<TodoFooter
-						count={this.state.remainingCount}
-						completedCount={this.state.completedCount}
-						filter={this.state.filter}
-						onClearCompleted={this.handlers.clearCompletedTodos}
-						onChangeFilter={this.handlers.setFilter}
-					/>
+					<div className="footer">
+						<span className="todo-count">
+							<strong>{this.state.remainingCount}</strong> {activeTodoWord} left
+						</span>
+						<ul className="filters">
+							<li>
+								<a href="#/" className={classNames({selected: this.state.filter === app.constants.ALL_TODOS})}>All</a>
+							</li>
+							<li>
+								<a href="#/active" className={classNames({selected: this.state.filter === app.constants.ACTIVE_TODOS})}>Active</a>
+							</li>
+							<li>
+								<a href="#/completed" className={classNames({selected: this.state.filter === app.constants.COMPLETED_TODOS})}>Completed</a>
+							</li>
+						</ul>
+						{clearButton}
+					</div>
 				);
 			}
 		},

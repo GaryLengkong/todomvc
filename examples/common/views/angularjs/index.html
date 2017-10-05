@@ -19,7 +19,7 @@
 					</form>
 				</header>
 				<section id="main" ng-show="state.filteredTodos.length" ng-cloak>
-					<input id="toggle-all" type="checkbox" ng-checked="state.allChecked" ng-click="handlers.toggleAll()">
+					<input id="toggle-all" type="checkbox" ng-checked="state.isAllCompleted" ng-click="handlers.toggleAll()">
 					<label for="toggle-all">Mark all as complete</label>
 					<ul id="todo-list">
 						<li ng-repeat="todo in state.filteredTodos" ng-class="{completed: todo.completed, editing: todo == state.editedTodo}">

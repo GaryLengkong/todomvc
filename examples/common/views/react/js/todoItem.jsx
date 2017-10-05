@@ -12,16 +12,6 @@ var app = app || {};
 	var ENTER_KEY = 13;
 
 	app.TodoItem = React.createClass({
-		/**
-		 * This is a completely optional performance enhancement that you can
-		 * implement on any React component. If you were to delete this method
-		 * the app would still work correctly (and still be very performant!), we
-		 * just use it as an example of how little code it takes to get an order
-		 * of magnitude performance improvement.
-		 */
-		shouldComponentUpdate: function (nextProps, nextState) {
-			return true;
-		},
 
 		handleEditChange: function(event) {
 			this.props.onEditChange(event.target.value);
@@ -33,20 +23,6 @@ var app = app || {};
 	    } else if (event.which === ENTER_KEY) {
 	      this.props.onSubmit();
 	    }
-		},
-
-		/**
-		 * Safely manipulate the DOM after updating the state when invoking
-		 * `this.props.onEdit()` in the `handleEdit` method above.
-		 * For more info refer to notes at https://facebook.github.io/react/docs/component-api.html#setstate
-		 * and https://facebook.github.io/react/docs/component-specs.html#updating-componentdidupdate
-		 */
-		componentDidUpdate: function (prevProps) {
-			if (prevProps.editedTodo != this.props.todo  && this.props.editedTodo == this.props.todo) {
-				var node = React.findDOMNode(this.refs.editField);
-				node.focus();
-				node.setSelectionRange(node.value.length, node.value.length);
-			}
 		},
 
 		render: function () {

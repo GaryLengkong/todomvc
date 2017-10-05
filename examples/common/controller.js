@@ -5,7 +5,7 @@
  * Route parameters can also be passed in if using view
  * specific router.
  */
-function todoController(updateView, routeParams) {
+function todoController(updateViewState, routeParams) {
 
   var state = {
     filter: constants.ALL_TODOS,
@@ -15,7 +15,7 @@ function todoController(updateView, routeParams) {
     remainingCount: 0,
     completedCount: 0,
     newTodo: '',
-    allChecked: false,
+    isAllCompleted: false,
     originalTodo: '',
     isLoaded: true
   };
@@ -30,6 +30,9 @@ function todoController(updateView, routeParams) {
     clearCompletedTodos: clearCompletedTodos,
     toggleAll: toggleAll,
     setFilter: setFilter,
+    // Methods used by react
+    // React apps shouldn't update values on its own using setState because setState will generate
+    // a new object instead of updating the existing object.
     setEditedTodo: setEditedTodo,
     setNewTodo: setNewTodo
     /*
@@ -146,9 +149,9 @@ function todoController(updateView, routeParams) {
   }
 
   function toggleAll() {
-    state.allChecked = !state.allChecked;
+    state.isAllCompleted = !state.isAllCompleted;
     state.todos.forEach(function (todo) {
-      todo.completed = state.allChecked;
+      todo.completed = state.isAllCompleted;
     });
   }
 
@@ -169,33 +172,34 @@ function todoController(updateView, routeParams) {
   // Update methods
 
   function update() {
-    // Update computed states
-    updateFilteredTodos();
-    updateCounts();
+    updateComputedStates();
 
     updateStateInStore();
-    if (updateView) {
-      updateView(state);
+    if (updateViewState) {
+      updateViewState(state);
     }
   }
 
-  function updateCounts() {
-    state.remainingCount = state.todos.filter(function(todo) {
+  /**
+   * Writing it this way guarantees no circular dependency between states,
+   * since it's only called maximum once after a view event is handled.
+   * The downside is that this method must be called manually if the handler
+   * method is triggered by a backend event.
+   */
+  function updateComputedStates() {
+    var completed = state.todos.filter(function(todo) {
+      return todo.completed;
+    });
+    var remaining = state.todos.filter(function(todo) {
       return !todo.completed;
-    }).length;
-    state.completedCount = state.todos.length - state.remainingCount;
-    state.allChecked = state.remainingCount === 0;
-  }
-
-  function updateFilteredTodos() {
+    });
+    state.remainingCount = remaining.length;
+    state.completedCount = completed.length;
+    state.isAllCompleted = state.remainingCount === 0;
     state.isAllFiltered = !state.filter || state.filter === constants.ALL_TODOS;
     state.isActiveFiltered = state.filter === constants.ACTIVE_TODOS;
     state.isCompletedFiltered = state.filter === constants.COMPLETED_TODOS;
-
-    state.filteredTodos = state.todos.filter(function(todo) {
-      return state.isAllFiltered ? true :
-        state.isCompletedFiltered ? todo.completed : !todo.completed;
-    });
+    state.filteredTodos = state.isAllFiltered ? state.todos : state.isCompletedFiltered ? completed : remaining;
   }
 
   // Methods for storing, retrieving state from store
@@ -207,40 +211,5 @@ function todoController(updateView, routeParams) {
   function updateStateInStore() {
     return util.setItemInStore(constants.STORE_KEY, state);
   }
-
-  // Optional getters for computed states (states that derive values from other states)
-  // No need to call updateCounts and updateFilteredTodos in the update function if
-  // we use this, but performance will be worse off.
-  /*
-  function getRemainingCount() {
-    return state.todos.filter(function(todo) {
-      return !todo.completed;
-    }).length;
-  }
-
-  function getCompletedCount() {
-    return state.todos.filter(function(todo) {
-      return todo.completed;
-    }).length;
-  }
-
-  function isAllCompleted() {
-    return state.remainingCount === 0;
-  }
-
-  function getFilteredTodos() {
-    if (state.filter === constants.ACTIVE_TODOS) {
-      return state.todos.filter(function(todo) {
-        return !todo.completed;
-      });
-    } else if (state.filter === constants.COMPLETED_TODOS) {
-      return state.todos.filter(function(todo) {
-        return todo.completed;
-      });
-    } else if (state.filter === constants.ALL_TODOS || state.filter === ''){
-      return state.todos;
-    }
-  }
-  */
 
 }

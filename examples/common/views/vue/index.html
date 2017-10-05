@@ -14,7 +14,7 @@
 				<input class="new-todo" autofocus autocomplete="off" placeholder="What needs to be done?" v-model="state.newTodo" @keyup.enter="addTodo">
 			</header>
 			<section class="main" v-show="state.todos.length">
-				<input class="toggle-all" type="checkbox" :checked="state.allChecked" @click="toggleAll">
+				<input class="toggle-all" type="checkbox" :checked="state.isAllCompleted" @click="toggleAll">
 				<ul class="todo-list">
 					<li class="todo" v-for="todo in state.filteredTodos" :class="{completed: todo.completed, editing: todo == state.editedTodo}">
 						<div class="view">
