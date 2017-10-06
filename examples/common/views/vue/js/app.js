@@ -18,8 +18,7 @@
 
 		// app initial state
 		data: {
-			state: state,
-			constants: constants
+			state: state
 		},
 
 		// methods that implement data logic.

@@ -43,10 +43,10 @@
 							<a ng-class="{selected: state.isAllFiltered} " href="#/">All</a>
 						</li>
 						<li>
-							<a ng-class="{selected: state.isActiveFiltered}" href="#/{{constants.ACTIVE_TODOS}}">Active</a>
+							<a ng-class="{selected: state.isActiveFiltered}" href="#/{{state.ACTIVE_TODOS}}">Active</a>
 						</li>
 						<li>
-							<a ng-class="{selected: state.isCompletedFiltered}" href="#/{{constants.COMPLETED_TODOS}}">Completed</a>
+							<a ng-class="{selected: state.isCompletedFiltered}" href="#/{{state.COMPLETED_TODOS}}">Completed</a>
 						</li>
 					</ul>
 					<button id="clear-completed" ng-click="handlers.clearCompletedTodos()" ng-show="state.completedCount">Clear completed</button>
@@ -67,7 +67,6 @@
 		<script src="node_modules/angular/angular.js"></script>
 		<script src="node_modules/angular-route/angular-route.js"></script>
 		<script src="node_modules/angular-resource/angular-resource.js"></script>
-		<script src="../../constants.js"></script>
 		<script src="../../util.js"></script>
 		<script src="../../backend.js"></script>
 		<script src="../../controller.js"></script>

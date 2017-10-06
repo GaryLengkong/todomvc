@@ -8,7 +8,13 @@
 function todoController(updateViewState, routeParams) {
 
   var state = {
-    filter: constants.ALL_TODOS,
+    NAME_URL_PARAM: 'name',
+    STORE_KEY: 'todo',
+    ALL_TODOS: 'all',
+    ACTIVE_TODOS: 'active',
+    COMPLETED_TODOS: 'completed',
+
+    filter: '',
     todos: [],
     editedTodo: null,
     filteredTodos: [],
@@ -35,12 +41,6 @@ function todoController(updateViewState, routeParams) {
     // a new object instead of updating the existing object.
     setEditedTodo: setEditedTodo,
     setNewTodo: setNewTodo
-    /*
-    getFilteredTodos: getFilteredTodos,
-    getCompletedCount: getCompletedCount,
-    getRemainingCount: getRemainingCount,
-    isAllCompleted: isAllCompleted
-    */
   };
 
   activate();
@@ -59,12 +59,15 @@ function todoController(updateViewState, routeParams) {
   */
 
   function activate() {
+
+    state.filter = state.ALL_TODOS;
+
     // Get name of object from route param and retrieve data from the backend
     // Optionally you can get
     if (!routeParams) {
       routeParams = util.getRouteParameters();
     }
-    var todosName = routeParams[constants.NAME_URL_PARAM];
+    var todosName = routeParams[state.NAME_URL_PARAM];
     if (todosName) {
       // Load model data from backend (no ui state)
       loadTodos(todosName);
@@ -196,20 +199,20 @@ function todoController(updateViewState, routeParams) {
     state.remainingCount = remaining.length;
     state.completedCount = completed.length;
     state.isAllCompleted = state.remainingCount === 0;
-    state.isAllFiltered = !state.filter || state.filter === constants.ALL_TODOS;
-    state.isActiveFiltered = state.filter === constants.ACTIVE_TODOS;
-    state.isCompletedFiltered = state.filter === constants.COMPLETED_TODOS;
+    state.isAllFiltered = !state.filter || state.filter === state.ALL_TODOS;
+    state.isActiveFiltered = state.filter === state.ACTIVE_TODOS;
+    state.isCompletedFiltered = state.filter === state.COMPLETED_TODOS;
     state.filteredTodos = state.isAllFiltered ? state.todos : state.isCompletedFiltered ? completed : remaining;
   }
 
   // Methods for storing, retrieving state from store
 
   function getStateFromStore() {
-    return util.getItemFromStore(constants.STORE_KEY);
+    return util.getItemFromStore(state.STORE_KEY);
   }
 
   function updateStateInStore() {
-    return util.setItemInStore(constants.STORE_KEY, state);
+    return util.setItemInStore(state.STORE_KEY, state);
   }
 
 }

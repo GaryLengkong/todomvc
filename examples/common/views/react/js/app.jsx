@@ -17,15 +17,14 @@ var app = app || {};
 		getInitialState: function() {
 			this.controller = todoController(this.setState.bind(this));
 			this.handlers = this.controller.handlers;
-			app.constants = constants;
 			return this.controller.state;
 		},
 
 		componentDidMount: function() {
 			var router = Router({
-				'/': this.handlers.setFilter.bind(this, constants.ALL_TODOS),
-				'/active' : this.handlers.setFilter.bind(this, constants.ACTIVE_TODOS),
-				'/completed': this.handlers.setFilter.bind(this, constants.COMPLETED_TODOS)
+				'/': this.handlers.setFilter.bind(this, this.state.ALL_TODOS),
+				'/active' : this.handlers.setFilter.bind(this, this.state.ACTIVE_TODOS),
+				'/completed': this.handlers.setFilter.bind(this, this.state.COMPLETED_TODOS)
 			});
 			router.init('/');
 		},
@@ -39,76 +38,6 @@ var app = app || {};
 				return;
 			}
 			this.handlers.addTodo();
-		},
-
-		todoItems: function() {
-			return this.state.filteredTodos.map(function (todo) {
-				return (
-					<TodoItem
-						todo={todo}
-						editedTodo={this.state.editedTodo}
-						onEscape={this.handlers.revertEdits.bind(this, todo)}
-						onEditChange={this.handlers.setEditedTodo}
-						onSubmit={this.handlers.saveEdits.bind(this, todo)}
-						onDestroy={this.handlers.removeTodo.bind(this, todo)}
-						onDoubleClick={this.handlers.editTodo.bind(this, todo)}
-						onToggle={this.handlers.toggleCompleted.bind(this, todo)}
-					/>
-				);
-			}, this);
-		},
-
-		main: function() {
-			if (this.state.filteredTodos.length) {
-				return (
-					<section className="main">
-						<input
-							className="toggle-all"
-							type="checkbox"
-							onChange={this.handlers.toggleAll}
-							checked={this.state.isAllCompleted}
-						/>
-						<ul className="todo-list">
-							{this.todoItems()}
-						</ul>
-					</section>
-				);
-			}
-		},
-
-		footer: function() {
-			var activeTodoWord = app.Utils.pluralize(this.state.remainingCount, 'item');
-			var clearButton = null;
-
-			if (this.state.completedCount > 0) {
-				clearButton = (
-					<button
-						className="clear-completed"
-						onClick={this.handlers.clearCompletedTodos}>
-						Clear completed
-					</button>
-				);
-
-				return (
-					<div className="footer">
-						<span className="todo-count">
-							<strong>{this.state.remainingCount}</strong> {activeTodoWord} left
-						</span>
-						<ul className="filters">
-							<li>
-								<a href="#/" className={classNames({selected: this.state.filter === app.constants.ALL_TODOS})}>All</a>
-							</li>
-							<li>
-								<a href="#/active" className={classNames({selected: this.state.filter === app.constants.ACTIVE_TODOS})}>Active</a>
-							</li>
-							<li>
-								<a href="#/completed" className={classNames({selected: this.state.filter === app.constants.COMPLETED_TODOS})}>Completed</a>
-							</li>
-						</ul>
-						{clearButton}
-					</div>
-				);
-			}
 		},
 
 		render: function () {
@@ -130,7 +59,71 @@ var app = app || {};
 					{this.footer()}
 				</div>
 			);
-		}
+		},
+
+		main: function() {
+			if (this.state.filteredTodos.length) {
+				return (
+					<section className="main">
+						<input
+							className="toggle-all"
+							type="checkbox"
+							onChange={this.handlers.toggleAll}
+							checked={this.state.isAllCompleted}
+						/>
+						<ul className="todo-list">
+							{this.todoItems()}
+						</ul>
+					</section>
+				);
+			}
+		},
+
+		todoItems: function() {
+			return this.state.filteredTodos.map(function (todo) {
+				return (
+					<TodoItem
+						todo={todo}
+						editedTodo={this.state.editedTodo}
+						onEscape={this.handlers.revertEdits.bind(this, todo)}
+						onEditChange={this.handlers.setEditedTodo}
+						onSubmit={this.handlers.saveEdits.bind(this, todo)}
+						onDestroy={this.handlers.removeTodo.bind(this, todo)}
+						onDoubleClick={this.handlers.editTodo.bind(this, todo)}
+						onToggle={this.handlers.toggleCompleted.bind(this, todo)}
+					/>
+				);
+			}, this);
+		},
+
+		footer: function() {
+			return (
+				<div className="footer">
+					<span className="todo-count">
+						<strong>{this.state.remainingCount}</strong> {app.Utils.pluralize(this.state.remainingCount, 'item')} left
+					</span>
+					<ul className="filters">
+						<li>
+							<a href="#/" className={classNames({selected: this.state.filter === this.state.ALL_TODOS})}>All</a>
+						</li>
+						<li>
+							<a href="#/active" className={classNames({selected: this.state.filter === this.state.ACTIVE_TODOS})}>Active</a>
+						</li>
+						<li>
+							<a href="#/completed" className={classNames({selected: this.state.filter === this.state.COMPLETED_TODOS})}>Completed</a>
+						</li>
+					</ul>
+					{this.state.completedCount > 0 && (
+							<button
+								className="clear-completed"
+								onClick={this.handlers.clearCompletedTodos}>
+								Clear completed
+							</button>
+					)}
+				</div>
+			);
+		},
+
 	});
 
 	// var model = new app.TodoModel('react-todos');

@@ -12,7 +12,7 @@
     "learn.json"
   ],
   "scripts": {
-    "test-server": "gulp test-server &",
+    "test-server": "gulp test-server",
     "gulp": "gulp"
   },
   "dependencies": {

@@ -12,5 +12,4 @@ angular.module('todomvc')
 		var controller = todoController(null, $routeParams);
 		$scope.state = controller.state;
 		$scope.handlers = controller.handlers;
-		$scope.constants = constants;
 	});
