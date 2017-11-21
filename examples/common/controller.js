@@ -5,7 +5,7 @@
  * Route parameters can also be passed in if using view
  * specific router.
  */
-function todoController(updateViewState, routeParams) {
+function todoController(getViewState, setViewState, routeParams) {
 
   var state = {
     NAME_URL_PARAM: 'name',
@@ -47,14 +47,17 @@ function todoController(updateViewState, routeParams) {
 
   // This will cause update to be called once and after every call to any method in handlers
   // It's a convenience function to make sure that developers don't forget to do it
-  return getController(state, handlers, update);
+  return getController(state, handlers, before, after);
 
   // Alternatively
   /*
+  if (after) {
+    after();
+  }
+  
   return {
     state: state,
-    handlers: util.wrapFunctions(handlers, null, update, this),
-    constants: constants
+    handlers: util.wrapFunctions(handlers, before, after, this)
   };
   */
 
@@ -89,7 +92,7 @@ function todoController(updateViewState, routeParams) {
     return backend.getTodos(todosName).then(function(todos) {
       state.todos = todos;
       state.isLoaded = true;
-      update();
+      after();
     });
   }
 
@@ -102,7 +105,7 @@ function todoController(updateViewState, routeParams) {
   function loadData() {
     return backend.getInfo().then(function(info) {
       state.info = info;
-      update();
+      after();
     });
   }
 
@@ -173,13 +176,17 @@ function todoController(updateViewState, routeParams) {
   }
 
   // Update methods
+  function before() {
+    if (getViewState) {
+      state = getViewState();
+    }
+  }
 
-  function update() {
+  function after() {
     updateComputedStates();
-
     updateStateInStore();
-    if (updateViewState) {
-      updateViewState(state);
+    if (setViewState) {
+      setViewState(state);
     }
   }
 

@@ -15,7 +15,11 @@ var app = app || {};
 	var TodoApp = React.createClass({
 
 		getInitialState: function() {
-			this.controller = todoController(this.setState.bind(this));
+			var getViewState = function() {
+				return this.state;
+			}.bind(this);
+			var setViewState = this.setState.bind(this);
+			this.controller = todoController(getViewState, setViewState);
 			this.handlers = this.controller.handlers;
 			return this.controller.state;
 		},
@@ -56,7 +60,7 @@ var app = app || {};
 						/>
 					</header>
 					{this.main()}
-					{this.footer()}
+					{this.state.todos.length > 0 && this.footer()}
 				</div>
 			);
 		},
