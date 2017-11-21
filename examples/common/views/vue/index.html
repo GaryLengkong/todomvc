@@ -14,7 +14,7 @@
 				<input class="new-todo" autofocus autocomplete="off" placeholder="What needs to be done?" v-model="state.newTodo" @keyup.enter="addTodo">
 			</header>
 			<section class="main" v-show="state.todos.length">
-				<input class="toggle-all" type="checkbox" :checked="state.allChecked" @click="toggleAll">
+				<input class="toggle-all" type="checkbox" :checked="state.isAllCompleted" @click="toggleAll">
 				<ul class="todo-list">
 					<li class="todo" v-for="todo in state.filteredTodos" :class="{completed: todo.completed, editing: todo == state.editedTodo}">
 						<div class="view">
@@ -31,9 +31,9 @@
 					<strong v-text="state.remainingCount"></strong> {{pluralize('item', state.remainingCount)}} left
 				</span>
 				<ul class="filters">
-					<li><a href="#/all" @click="setFilter(constants.ALL_TODOS)" :class="{selected: state.filter == constants.ALL_TODOS}">All</a></li>
-					<li><a href="#/active" @click="setFilter(constants.ACTIVE_TODOS)" :class="{selected: state.filter == constants.ACTIVE_TODOS}">Active</a></li>
-					<li><a href="#/completed" @click="setFilter(constants.COMPLETED_TODOS)" :class="{selected: state.filter == constants.COMPLETED_TODOS}">Completed</a></li>
+					<li><a href="#/all" :class="{selected: state.isAllFiltered}">All</a></li>
+					<li><a href="#/active" :class="{selected: state.isActiveFiltered}">Active</a></li>
+					<li><a href="#/completed" :class="{selected: state.isCompletedFiltered}">Completed</a></li>
 				</ul>
 				<button class="clear-completed" @click="clearCompletedTodos" v-show="state.todos.length > state.remainingCount">
 					Clear completed
@@ -48,6 +48,8 @@
 		<script src="node_modules/todomvc-common/base.js"></script>
 		<script src="node_modules/director/build/director.js"></script>
 		<script src="node_modules/vue/dist/vue.js"></script>
+		<script src="../../backend.js"></script>
+		<script src="../../util.js"></script>
 		<script src="../../controller.js"></script>
 		<script src="js/store.js"></script>
 		<script src="js/app.js"></script>

@@ -11,21 +11,12 @@ angular.module('todomvc', ['ngRoute', 'ngResource'])
 
 		var routeConfig = {
 			controller: 'TodoCtrl',
-			templateUrl: 'todomvc-index.html',
-			resolve: {
-				store: function (todoStorage) {
-					// Get the correct module (API or localStorage).
-					return todoStorage.then(function (module) {
-						module.get(); // Fetch the todo records in the background.
-						return module;
-					});
-				}
-			}
+			templateUrl: 'todomvc-index.html'
 		};
 
 		$routeProvider
 			.when('/', routeConfig)
-			.when('/:status', routeConfig)
+			.when('/:filter', routeConfig)
 			.otherwise({
 				redirectTo: '/'
 			});

@@ -8,7 +8,6 @@ var app = app || {};
 (function () {
 	'use strict';
 
-	var TodoFooter = app.TodoFooter;
 	var TodoItem = app.TodoItem;
 
 	var ENTER_KEY = 13;
@@ -16,10 +15,22 @@ var app = app || {};
 	var TodoApp = React.createClass({
 
 		getInitialState: function() {
-			this.controller = todoController(this.setState.bind(this));
+			var getViewState = function() {
+				return this.state;
+			}.bind(this);
+			var setViewState = this.setState.bind(this);
+			this.controller = todoController(getViewState, setViewState);
 			this.handlers = this.controller.handlers;
-			app.constants = this.controller.constants;
 			return this.controller.state;
+		},
+
+		componentDidMount: function() {
+			var router = Router({
+				'/': this.handlers.setFilter.bind(this, this.state.ALL_TODOS),
+				'/active' : this.handlers.setFilter.bind(this, this.state.ACTIVE_TODOS),
+				'/completed': this.handlers.setFilter.bind(this, this.state.COMPLETED_TODOS)
+			});
+			router.init('/');
 		},
 
 		handleNewTodoChange: function (event) {
@@ -34,51 +45,6 @@ var app = app || {};
 		},
 
 		render: function () {
-			var footer;
-			var main;
-
-			var todoItems = this.state.filteredTodos.map(function (todo) {
-				return (
-					<TodoItem
-						todo={todo}
-						editedTodo={this.state.editedTodo}
-						onEscape={this.handlers.revertEdits.bind(this, todo)}
-						onEditChange={this.handlers.setEditedTodo}
-						onSubmit={this.handlers.saveEdits.bind(this, todo)}
-						onDestroy={this.handlers.removeTodo.bind(this, todo)}
-						onDoubleClick={this.handlers.editTodo.bind(this, todo)}
-						onToggle={this.handlers.toggleCompleted.bind(this, todo)}
-					/>
-				);
-			}, this);
-
-
-			if (this.state.remainingCount || this.state.completedCount) {
-				footer =
-					<TodoFooter
-						count={this.state.remainingCount}
-						completedCount={this.state.completedCount}
-						nowShowing={this.state.filter}
-						onClearCompleted={this.handlers.clearCompletedTodos}
-						onChangeFilter={this.handlers.setFilter}
-					/>;
-			}
-
-			if (this.state.filteredTodos.length) {
-				main = (
-					<section className="main">
-						<input
-							className="toggle-all"
-							type="checkbox"
-							onChange={this.handlers.toggleAll}
-							checked={this.state.remainingCount === 0}
-						/>
-						<ul className="todo-list">
-							{todoItems}
-						</ul>
-					</section>
-				);
-			}
 
 			return (
 				<div>
@@ -93,11 +59,75 @@ var app = app || {};
 							autoFocus={true}
 						/>
 					</header>
-					{main}
-					{footer}
+					{this.main()}
+					{this.state.todos.length > 0 && this.footer()}
 				</div>
 			);
-		}
+		},
+
+		main: function() {
+			if (this.state.filteredTodos.length) {
+				return (
+					<section className="main">
+						<input
+							className="toggle-all"
+							type="checkbox"
+							onChange={this.handlers.toggleAll}
+							checked={this.state.isAllCompleted}
+						/>
+						<ul className="todo-list">
+							{this.todoItems()}
+						</ul>
+					</section>
+				);
+			}
+		},
+
+		todoItems: function() {
+			return this.state.filteredTodos.map(function (todo) {
+				return (
+					<TodoItem
+						todo={todo}
+						editedTodo={this.state.editedTodo}
+						onEscape={this.handlers.revertEdits.bind(this, todo)}
+						onEditChange={this.handlers.setEditedTodo}
+						onSubmit={this.handlers.saveEdits.bind(this, todo)}
+						onDestroy={this.handlers.removeTodo.bind(this, todo)}
+						onDoubleClick={this.handlers.editTodo.bind(this, todo)}
+						onToggle={this.handlers.toggleCompleted.bind(this, todo)}
+					/>
+				);
+			}, this);
+		},
+
+		footer: function() {
+			return (
+				<div className="footer">
+					<span className="todo-count">
+						<strong>{this.state.remainingCount}</strong> {app.Utils.pluralize(this.state.remainingCount, 'item')} left
+					</span>
+					<ul className="filters">
+						<li>
+							<a href="#/" className={classNames({selected: this.state.filter === this.state.ALL_TODOS})}>All</a>
+						</li>
+						<li>
+							<a href="#/active" className={classNames({selected: this.state.filter === this.state.ACTIVE_TODOS})}>Active</a>
+						</li>
+						<li>
+							<a href="#/completed" className={classNames({selected: this.state.filter === this.state.COMPLETED_TODOS})}>Completed</a>
+						</li>
+					</ul>
+					{this.state.completedCount > 0 && (
+							<button
+								className="clear-completed"
+								onClick={this.handlers.clearCompletedTodos}>
+								Clear completed
+							</button>
+					)}
+				</div>
+			);
+		},
+
 	});
 
 	// var model = new app.TodoModel('react-todos');
