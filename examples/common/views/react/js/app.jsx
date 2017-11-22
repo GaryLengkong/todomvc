@@ -19,9 +19,9 @@ var app = app || {};
 				return this.state;
 			}.bind(this);
 			var setViewState = this.setState.bind(this);
-			this.controller = todoController(getViewState, setViewState);
-			this.handlers = this.controller.handlers;
-			return this.controller.state;
+			this.presenter = new TodoPresenter(null, getViewState, setViewState);
+			this.handlers = this.presenter.handlers;
+			return this.presenter.state;
 		},
 
 		componentDidMount: function() {

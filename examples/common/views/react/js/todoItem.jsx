@@ -39,14 +39,14 @@ var app = app || {};
 							onChange={this.props.onToggle}
 						/>
 						<label onDoubleClick={this.props.onDoubleClick}>
-							{this.props.todo.title}
+							{this.props.todo.text}
 						</label>
 						<button className="destroy" onClick={this.props.onDestroy} />
 					</div>
 					<input
 						ref="editField"
 						className="edit"
-						value={this.props.editedTodo ? this.props.editedTodo.title : ''}
+						value={this.props.editedTodo ? this.props.editedTodo.text : ''}
 						onBlur={this.props.onSubmit}
 						onChange={this.handleEditChange}
 						onKeyDown={this.handleEditKeyDown}

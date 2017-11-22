@@ -3,8 +3,8 @@ var util = {
   wrapFunction: wrapFunction,
   wrapFunctions: wrapFunctions,
   getController: getController,
-  getItemFromStore: getItemFromStore,
-  setItemInStore: setItemInStore
+  getStoredItem: getStoredItem,
+  setStoredItem: setStoredItem
 }
 
 function getRouteParameters() {
@@ -26,7 +26,16 @@ function wrapFunction(functionToWrap, before, after, thisObject) {
         result;
     if (before) before.apply(thisObject || this, args);
     result = functionToWrap.apply(thisObject || this, args);
-    if (after) after.apply(thisObject || this, args);
+    var isPromise = result && typeof result.then === 'function';
+    if (after) {
+      if (isPromise) {
+        return Promise.resolve(result).then(function() {
+          after.apply(thisObject || this, args);
+        });
+      } else {
+        after.apply(thisObject || this, args);
+      }
+    }
     return result;
   }
 }
@@ -51,10 +60,10 @@ function getController(state, handlers, before, after) {
   };
 }
 
-function getItemFromStore(key) {
+function getStoredItem(key) {
   return JSON.parse(sessionStorage.getItem(key));
 }
 
-function setItemInStore(key, value) {
+function setStoredItem(key, value) {
   return sessionStorage.setItem(key, JSON.stringify(value));
 }

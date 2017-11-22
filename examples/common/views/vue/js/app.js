@@ -4,9 +4,9 @@
 
 	'use strict';
 
-	var controller = new todoController();
-	var state = controller.state;
-	var handlers = controller.handlers;
+	var presenter = new TodoPresenter();
+	var state = presenter.state;
+	var handlers = presenter.handlers;
 	handlers.pluralize = function (word, count) {
 		return word + (count === 1 ? '' : 's');
 	}

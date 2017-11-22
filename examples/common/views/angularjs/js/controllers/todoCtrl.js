@@ -9,7 +9,7 @@ angular.module('todomvc')
 	.controller('TodoCtrl', function TodoCtrl($scope, $routeParams, $filter) {
 		'use strict';
 
-		var controller = todoController(null, null, $routeParams);
-		$scope.state = controller.state;
-		$scope.handlers = controller.handlers;
+		var presenter = new TodoPresenter($routeParams, null, null);
+		$scope.state = presenter.state;
+		$scope.handlers = presenter.handlers;
 	});
