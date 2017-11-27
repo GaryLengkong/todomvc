@@ -78,11 +78,18 @@ class TodoPresenter extends Presenter {
     });
   }
 
+  getNewTodoId() {
+    return this.state.todos.reduce((id, todo) => {
+      return Math.max(id, todo.id)
+    }, 0) + 1;
+  }
+
   addTodo() {
     if (this.state.newTodo) {
       var newTodo = {
         text: this.state.newTodo.trim(),
-        completed: false
+        completed: false,
+        id: this.getNewTodoId()
       };
       this.state.todos.push(newTodo);
       this.state.newTodo = '';
@@ -144,12 +151,6 @@ class TodoPresenter extends Presenter {
     this.state.editedTodo.text = value;
   }
 
-  /**
-   * Writing it this way guarantees no circular dependency between states,
-   * since it's only called maximum once after a view event is handled.
-   * The downside is that this method must be called manually if the handler
-   * method is triggered by a backend event.
-   */
   updateComputedState() {
     var completed = this.state.todos.filter((todo) => {
       return todo.completed;

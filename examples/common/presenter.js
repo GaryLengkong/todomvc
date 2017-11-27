@@ -30,7 +30,6 @@ class Presenter {
     return util.wrapFunctions(handlers, this.before, this.after, this)
   }
 
-
   before() {
     if (this.getViewState) {
       this.state = this.getViewState();

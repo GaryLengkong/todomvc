@@ -87,6 +87,7 @@ var app = app || {};
 			return this.state.filteredTodos.map(function (todo) {
 				return (
 					<TodoItem
+						key={todo.id}
 						todo={todo}
 						editedTodo={this.state.editedTodo}
 						onEscape={this.handlers.revertEdits.bind(this, todo)}

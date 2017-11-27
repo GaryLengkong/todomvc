@@ -16,7 +16,7 @@
 			<section class="main" v-show="state.todos.length">
 				<input class="toggle-all" type="checkbox" :checked="state.isAllCompleted" @click="toggleAll">
 				<ul class="todo-list">
-					<li class="todo" v-for="todo in state.filteredTodos" :class="{completed: todo.completed, editing: todo == state.editedTodo}">
+					<li class="todo" v-for="todo in state.filteredTodos" :key="todo.id" :class="{completed: todo.completed, editing: todo == state.editedTodo}">
 						<div class="view">
 							<input class="toggle" type="checkbox" :checked="todo.completed" @click="toggleCompleted(todo)">
 							<label @dblclick="editTodo(todo)">{{todo.text}}</label>
